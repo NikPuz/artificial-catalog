@@ -4,8 +4,7 @@ import (
 	"artificial-catalog/internal/entity"
 	"context"
 	"database/sql"
-
-	//"fmt"
+	
 	"strings"
 
 	"go.uber.org/zap"
