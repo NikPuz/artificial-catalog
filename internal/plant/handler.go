@@ -15,9 +15,10 @@ type plantHandler struct {
 }
 
 func RegisterPlantHandlers(r *mux.Router, service PlantService, logger *zap.Logger) {
-	plantHandler := new(plantHandler)
-	plantHandler.logger = logger
-	plantHandler.plantService = service
+	plantHandler := plantHandler{
+		plantService: service,
+		logger: logger,
+	}
 
 	r.HandleFunc("/dai", plantHandler.GetPage).Methods("GET")
 	r.HandleFunc("/image/{imageName}", plantHandler.GetImage).Methods("GET")

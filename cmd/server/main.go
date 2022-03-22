@@ -43,7 +43,7 @@ func main() {
 func configServer(router *mux.Router) *http.Server {
 	return &http.Server{
 		Handler:        router,
-		Addr:           ":8000",
+		Addr:           ":" + viper.GetString("DB_PORT"),
 		WriteTimeout:   5 * time.Second,
 		ReadTimeout:    5 * time.Second,
 		MaxHeaderBytes: 1 << 20,
@@ -64,7 +64,7 @@ func initViperConfigger(logger *zap.Logger) {
 func initDbConn(logger *zap.Logger) *sql.DB {
 	db, err := sql.Open(
 		viper.GetString("DB_DRIVER"),
-		viper.GetString("DB_SOURCE"))
+		viper.GetString("DB_USER") + viper.GetString("DB_PASSWORD") + "@" + viper.GetString("DB_SOURSE") + "/" + "")
 	if err != nil {
 		logger.Error("failed connect to db", zap.Error(err))
 		fmt.Println(err)
