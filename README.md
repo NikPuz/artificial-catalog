@@ -9,3 +9,7 @@
 - GET /
 - GET /dai
 - GET /image/{imageName}
+
+Запуск:
+- Установленный Docker https://www.docker.com/products/docker-desktop/
+- `$ docker compose --env-file ./config/app.env up` в папке проекта
