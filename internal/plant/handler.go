@@ -2,7 +2,6 @@ package plant
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -17,7 +16,7 @@ type plantHandler struct {
 func RegisterPlantHandlers(r *mux.Router, service PlantService, logger *zap.Logger) {
 	plantHandler := plantHandler{
 		plantService: service,
-		logger: logger,
+		logger:       logger,
 	}
 
 	r.HandleFunc("/dai", plantHandler.GetPage).Methods("GET")
@@ -27,13 +26,21 @@ func RegisterPlantHandlers(r *mux.Router, service PlantService, logger *zap.Logg
 func (s plantHandler) GetPage(w http.ResponseWriter, r *http.Request) {
 	plants, err := s.plantService.GetPage(r.Context())
 	if err != nil {
-		panic(err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		s.logger.Error("GetPage", zap.Error(err))
+		return
 	}
+
 	req, err := json.Marshal(plants)
 	if err != nil {
-		panic("12")
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		s.logger.Error("GetPage Marshal", zap.Error(err))
+		return
 	}
-	fmt.Fprint(w, string(req))
+
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(req)
 }
 
 func (s plantHandler) GetImage(w http.ResponseWriter, r *http.Request) {
@@ -42,7 +49,9 @@ func (s plantHandler) GetImage(w http.ResponseWriter, r *http.Request) {
 
 	image, err := s.plantService.GetImage(r.Context(), imageNamge)
 	if err != nil {
-		panic(err)
+		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		s.logger.Error("GetImage", zap.Error(err))
+		return
 	}
 
 	w.WriteHeader(http.StatusOK)

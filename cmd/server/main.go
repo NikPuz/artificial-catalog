@@ -1,6 +1,7 @@
 package main
 
 import (
+	"artificial-catalog/internal/middleware"
 	"artificial-catalog/internal/plant"
 	"database/sql"
 	"fmt"
@@ -15,11 +16,6 @@ import (
 )
 
 func main() {
-	defer func() {
-		if r := recover(); r != nil {
-			fmt.Println(r)
-		}
-	}()
 
 	fmt.Println("Поехало!")
 
@@ -29,6 +25,8 @@ func main() {
 
 	db := initDbConn(logger)
 
+	middleware := middleware.NewMiddleware(logger)
+
 	router := mux.NewRouter()
 
 	plantRepository := plant.NewPlantRepository(db, logger)
@@ -37,13 +35,15 @@ func main() {
 
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { fmt.Fprintf(w, "Привет Мир") }).Methods("GET")
 
+	router.Use(middleware.PanicRecovery)
+
 	configServer(router).ListenAndServe()
 }
 
-func configServer(router *mux.Router) *http.Server {
+func configServer(router http.Handler) *http.Server {
 	return &http.Server{
 		Handler:        router,
-		Addr:           ":" + viper.GetString("DB_PORT"),
+		Addr:           ":" + viper.GetString("APP_PORT"),
 		WriteTimeout:   5 * time.Second,
 		ReadTimeout:    5 * time.Second,
 		MaxHeaderBytes: 1 << 20,
@@ -64,10 +64,9 @@ func initViperConfigger(logger *zap.Logger) {
 func initDbConn(logger *zap.Logger) *sql.DB {
 	db, err := sql.Open(
 		viper.GetString("DB_DRIVER"),
-		viper.GetString("DB_USER") + viper.GetString("DB_PASSWORD") + "@" + viper.GetString("DB_SOURSE") + "/" + "")
+		viper.GetString("DB_USER")+":"+viper.GetString("DB_PASSWORD")+"@"+viper.GetString("DB_SOURSE")+"/"+viper.GetString("DB_DATABASE"))
 	if err != nil {
 		logger.Error("failed connect to db", zap.Error(err))
-		fmt.Println(err)
 		os.Exit(1)
 	}
 	return db

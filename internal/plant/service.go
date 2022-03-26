@@ -38,7 +38,6 @@ func (r plantService) GetPage(ctx context.Context) ([]entity.Plant, error) {
 }
 
 func (r plantService) GetImage(ctx context.Context, iamgeNamge string) ([]byte, error) {
-	fmt.Println(fmt.Sprintf("image/%s", iamgeNamge))
 	f, err := ioutil.ReadFile(fmt.Sprintf("images/%s", iamgeNamge))
 	if err != nil {
 		return nil, err
