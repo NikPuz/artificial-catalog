@@ -2,6 +2,7 @@ package plant
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -40,7 +41,7 @@ func (s plantHandler) GetPage(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Header().Set("Content-Type", "application/json")
-	w.Write(req)
+	fmt.Fprint(w, "message: "+string(req))
 }
 
 func (s plantHandler) GetImage(w http.ResponseWriter, r *http.Request) {

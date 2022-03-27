@@ -35,6 +35,7 @@ func main() {
 
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) { fmt.Fprintf(w, "Привет Мир") }).Methods("GET")
 
+	router.Use(middleware.RequestLogger)
 	router.Use(middleware.PanicRecovery)
 
 	configServer(router).ListenAndServe()
@@ -64,7 +65,7 @@ func initViperConfigger(logger *zap.Logger) {
 func initDbConn(logger *zap.Logger) *sql.DB {
 	db, err := sql.Open(
 		viper.GetString("DB_DRIVER"),
-		viper.GetString("DB_USER")+":"+viper.GetString("DB_PASSWORD")+"@"+viper.GetString("DB_SOURSE")+"/"+viper.GetString("DB_DATABASE"))
+		viper.GetString("DB_USER")+":"+viper.GetString("DB_PASSWORD")+"@"+viper.GetString("DB_SOURCE")+"/"+viper.GetString("DB_DATABASE"))
 	if err != nil {
 		logger.Error("failed connect to db", zap.Error(err))
 		os.Exit(1)

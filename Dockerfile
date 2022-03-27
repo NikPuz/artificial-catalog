@@ -24,4 +24,4 @@ EXPOSE ${APP_PORT}
 
 #CMD /build/app/main && goose mysql "root:rpass@tcp(test_db:3306)/garden_db?parseTime=true" up
 
-CMD goose mysql "root:rpass@tcp(test_db:3306)/garden_db?parseTime=true" up && /build/app/main
+CMD goose mysql "${DB_USER}:${DB_PASSWORD}@${DB_SOURCE}/${DB_DATABASE}?parseTime=true" up && /build/app/main
